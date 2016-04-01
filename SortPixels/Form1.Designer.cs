@@ -37,6 +37,8 @@
             this.saveButton = new System.Windows.Forms.Button();
             this.radioButton1 = new System.Windows.Forms.RadioButton();
             this.radioButton2 = new System.Windows.Forms.RadioButton();
+            this.backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
+            this.undoButton = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).BeginInit();
             this.SuspendLayout();
@@ -150,11 +152,29 @@
             this.radioButton2.Text = "Vertical";
             this.radioButton2.UseVisualStyleBackColor = true;
             // 
+            // backgroundWorker1
+            // 
+            this.backgroundWorker1.DoWork += new System.ComponentModel.DoWorkEventHandler(this.backgroundWorker1_DoWork);
+            this.backgroundWorker1.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.backgroundWorker1_RunWorkerCompleted);
+            // 
+            // undoButton
+            // 
+            this.undoButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.undoButton.Enabled = false;
+            this.undoButton.Location = new System.Drawing.Point(742, 3);
+            this.undoButton.Name = "undoButton";
+            this.undoButton.Size = new System.Drawing.Size(75, 41);
+            this.undoButton.TabIndex = 13;
+            this.undoButton.Text = "Undo";
+            this.undoButton.UseVisualStyleBackColor = true;
+            this.undoButton.Click += new System.EventHandler(this.undoButton_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(901, 541);
+            this.Controls.Add(this.undoButton);
             this.Controls.Add(this.radioButton2);
             this.Controls.Add(this.radioButton1);
             this.Controls.Add(this.saveButton);
@@ -184,6 +204,8 @@
         private System.Windows.Forms.Button saveButton;
         private System.Windows.Forms.RadioButton radioButton1;
         private System.Windows.Forms.RadioButton radioButton2;
+        private System.ComponentModel.BackgroundWorker backgroundWorker1;
+        private System.Windows.Forms.Button undoButton;
     }
 }
 
