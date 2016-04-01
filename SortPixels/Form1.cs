@@ -57,14 +57,16 @@ namespace WindowsFormsApplication1
             s.FileName = fileName + "_sorted" + stages;
             s.DefaultExt = "png";
             s.Filter = "Image file (*.png) | *.png";
-            s.ShowDialog();
-            try
+            if (s.ShowDialog() == DialogResult.OK)
             {
-                pictureBox1.Image.Save(s.FileName);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message);
+                try
+                {
+                    pictureBox1.Image.Save(s.FileName);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message);
+                }
             }
         }
 
