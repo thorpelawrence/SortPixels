@@ -1,6 +1,6 @@
 # SortPixels
 
-C# Windows Forms Pixel Sorter
+C# WinForms Pixel Sorter
 
 ##Before
 ![Before](images/before.PNG)
