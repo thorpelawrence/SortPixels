@@ -1,5 +1,5 @@
 # SortPixels
 
 C# Windows Forms Pixel Sorter
-![Before]()
-![After]()
+![Before](images/before.PNG)
+![After](images/after.PNG)
