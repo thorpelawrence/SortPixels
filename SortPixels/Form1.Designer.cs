@@ -69,6 +69,7 @@
             // 
             // loadButton
             // 
+            this.loadButton.AllowDrop = true;
             this.loadButton.Location = new System.Drawing.Point(4, 3);
             this.loadButton.Name = "loadButton";
             this.loadButton.Size = new System.Drawing.Size(75, 42);
@@ -76,6 +77,8 @@
             this.loadButton.Text = "Browse..";
             this.loadButton.UseVisualStyleBackColor = true;
             this.loadButton.Click += new System.EventHandler(this.loadButton_Click);
+            this.loadButton.DragDrop += new System.Windows.Forms.DragEventHandler(this.loadButton_DragDrop);
+            this.loadButton.DragEnter += new System.Windows.Forms.DragEventHandler(this.loadButton_DragEnter);
             // 
             // label1
             // 

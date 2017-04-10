@@ -11,18 +11,19 @@ namespace WindowsFormsApplication1
         public Form1()
         {
             InitializeComponent();
+            imageHistory = new Stack<Bitmap>();
         }
-        int stages = 0;
         string fileName;
         Bitmap image;
         Bitmap imageSorted;
         float edgeThreshold;
-        List<List<Color>> sortedPixels;
+        Color[][] sortedPixels;
+        Stack<Bitmap> imageHistory;
         private void sortButton_Click(object sender, EventArgs e)
         {
             edgeThreshold = (float)numericUpDown1.Value;
             image = new Bitmap(pictureBox1.Image);
-            sortedPixels = new List<List<Color>>();
+            imageHistory.Push(image);
             sortButton.Enabled = false;
             loadButton.Enabled = false;
             radioButton1.Enabled = false;
@@ -30,20 +31,39 @@ namespace WindowsFormsApplication1
             numericUpDown1.Enabled = false;
             label1.Enabled = false;
             saveButton.Enabled = false;
+            undoButton.Enabled = false;
             backgroundWorker1.RunWorkerAsync();
-            stages++;
         }
 
         private void loadButton_Click(object sender, EventArgs e)
         {
             OpenFileDialog o = new OpenFileDialog();
             o.Filter = "Image files (*.jpg, *.jpeg, *.png) | *.jpg; *.jpeg; *.png";
-            o.ShowDialog();
+            if (o.ShowDialog() == DialogResult.OK)
+                try
+                {
+                    pictureBox1.Image = new Bitmap(Image.FromFile(o.FileName));
+                    fileName = o.SafeFileName;
+                    sortButton.Enabled = true;
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message);
+                }
+        }
+
+        private void loadButton_DragEnter(object sender, DragEventArgs e)
+        {
+            if (e.Data.GetDataPresent(DataFormats.FileDrop)) e.Effect = DragDropEffects.Copy;
+        }
+
+        private void loadButton_DragDrop(object sender, DragEventArgs e)
+        {
+            string file = ((string[])e.Data.GetData(DataFormats.FileDrop))[0];
             try
             {
-                pictureBox1.Image = new Bitmap(Image.FromFile(o.FileName));
-                fileName = o.SafeFileName;
-                sortButton.Enabled = true;
+                pictureBox1.Image = new Bitmap(Image.FromFile(file));
+                fileName = System.IO.Path.GetFileName(file);
             }
             catch (Exception ex)
             {
@@ -54,7 +74,7 @@ namespace WindowsFormsApplication1
         private void saveButton_Click(object sender, EventArgs e)
         {
             SaveFileDialog s = new SaveFileDialog();
-            s.FileName = fileName + "_sorted" + stages;
+            s.FileName = fileName + "_sorted" + imageHistory.Count;
             s.DefaultExt = "png";
             s.Filter = "Image file (*.png) | *.png";
             if (s.ShowDialog() == DialogResult.OK)
@@ -73,6 +93,7 @@ namespace WindowsFormsApplication1
         private void backgroundWorker1_DoWork(object sender, System.ComponentModel.DoWorkEventArgs e)
         {
             if (radioButton2.Checked) image.RotateFlip(RotateFlipType.Rotate90FlipNone);
+            sortedPixels = new Color[image.Height][];
             for (int y = 0; y < image.Height; y++)
             {
                 Dictionary<int, Color> row = new Dictionary<int, Color>();
@@ -97,7 +118,7 @@ namespace WindowsFormsApplication1
                     }
                 }
                 List<Color> rowPartValList = rowPart.Values.ToList();
-                List<int> rowPartKeyList = rowPart.Keys.ToList();
+                int[] rowPartKeyList = rowPart.Keys.ToArray();
                 rowPartValList.Sort(delegate (Color left, Color right)
                 {
                     return left.GetBrightness().CompareTo(right.GetBrightness());
@@ -106,8 +127,8 @@ namespace WindowsFormsApplication1
                 {
                     row.Add(rowPartKeyList[p], rowPartValList[p]);
                 }
-                sortedPixels.Add(row.Values.ToList());
-                int percentage = (int)((float)y / (float)image.Height * 100);
+                sortedPixels[y] = row.Values.ToArray();
+                int percentage = (int)((float)y / image.Height * 100);
                 if (percentage % 5 == 0)
                 {
                     progressBar.Invoke(new Action(() => progressBar.Value = percentage));
@@ -122,12 +143,17 @@ namespace WindowsFormsApplication1
                     imageSorted.SetPixel(x, y, sortedPixels[y][x]);
                 }
             }
-            if (radioButton2.Checked) imageSorted.RotateFlip(RotateFlipType.Rotate270FlipNone);
+            if (radioButton2.Checked)
+            {
+                imageSorted.RotateFlip(RotateFlipType.Rotate270FlipNone);
+                image.RotateFlip(RotateFlipType.Rotate270FlipNone);
+            }
+            imageHistory.Push(imageSorted);
         }
 
         private void backgroundWorker1_RunWorkerCompleted(object sender, System.ComponentModel.RunWorkerCompletedEventArgs e)
         {
-            pictureBox1.Image = imageSorted;
+            pictureBox1.Image = imageHistory.Pop();
             progressBar.Value = 100;
             sortButton.Enabled = true;
             loadButton.Enabled = true;
@@ -141,9 +167,12 @@ namespace WindowsFormsApplication1
 
         private void undoButton_Click(object sender, EventArgs e)
         {
-            pictureBox1.Image = image;
-            stages--;
-            undoButton.Enabled = false;
+            if (imageHistory.Count > 0)
+            {
+                pictureBox1.Image = imageHistory.Pop();
+                if (imageHistory.Count == 0)
+                    undoButton.Enabled = false;
+            }
         }
     }
 }
