@@ -2,7 +2,7 @@
 
 C# WinForms Pixel Sorter
 
-##Before
+## Before
 ![Before](images/before.PNG)
-##After
+## After
 ![After](images/after.PNG)
